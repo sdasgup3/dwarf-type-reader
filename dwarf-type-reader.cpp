@@ -2,7 +2,6 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/PrettyStackTrace.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Object/Binary.h"
 #include "llvm/Object/ObjectFile.h"
@@ -43,7 +42,8 @@ static void DumpObjectFile(ObjectFile &Obj, Twine Filename) {
 
   for (const auto &CU : DICtx->compile_units()) {
     const DWARFDie &die = CU->getUnitDIE(false);
-    DwarfVariableFinder finder(die);
+    DwarfVariableFinder finder(die, outs());
+    finder.dump();
   }
 }
 
