@@ -27,24 +27,15 @@ InputFilenames(cl::Positional, cl::desc("<input object files"),
     cl::ZeroOrMore);
 
 
-static void error(StringRef Filename, std::error_code EC) {
-  if (!EC)
-    return;
-  errs() << Filename << ": " << EC.message() << "\n";
-  exit(1);
-}
-
-static void DumpObjectFile(ObjectFile &Obj, Twine Filename) {
+static void DumpObjectFile(ObjectFile &Obj, StringRef Filename) {
   std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
 
-  outs() << Filename.str() << ":\tfile format " << Obj.getFileFormatName()
-    << "\n\n";
-
+  DwarfVariableFinder finder(Filename);
   for (const auto &CU : DICtx->compile_units()) {
-    const DWARFDie &die = CU->getUnitDIE(false);
-    DwarfVariableFinder finder(die, outs());
-    finder.dump();
+    const DWARFDie &cu_die = CU->getUnitDIE(false);
+    finder.findVariablesInCU(cu_die);
   }
+  finder.dump();
 }
 
 static void DumpInput(StringRef Filename) {

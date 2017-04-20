@@ -1,0 +1,57 @@
+package VariableType;
+
+message Variables {
+  repeated LocalVariable local_variables = 1;
+  repeated GlobalVariable global_variables = 2;
+}
+
+message GlobalVariable {
+  required Type type = 1;
+  required string name = 2;
+}
+
+message LocalVariable {
+  required Function scope = 1;
+  required bool is_formal_parameter = 2;
+  required Type type = 3;
+  optional int64 offset_from_frame_base = 4;
+  required string name = 5;
+}
+
+message Type {
+  // Base Type
+  required int64 size = 1;
+  required string c_type = 2;
+  
+  // Complex Type
+  enum metaType {
+    isScalar = 0;
+    isPointer = 1;
+    isArray = 2;
+    isStruct = 3;
+  }
+
+  required metaType kind = 3;
+  // Pointers and Arrays have eleent type 
+  optional Type element_type = 4;
+
+  // Arrays have count
+  optional int64 count = 5;
+
+  // Structures have memberList
+  repeated FieldType member_list = 6;
+}
+
+message FieldType {
+  required int64  field_offset = 1;
+  required Type   field_type  = 2;
+  required string   field_name  = 3;
+}
+
+message Function {
+  // This may not always be the function scope 
+  required    int64   entry_address = 2;
+  optional    string  symbol_name = 3;
+  
+}
+

@@ -1,11 +1,11 @@
 LLVM_CONFIG := llvm-config
 
 CXXFLAGS := -std=c++11 $(shell $(LLVM_CONFIG) --cxxflags) -Wall 
-CXXFLAGS += -g -O0 -I./
-LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags --libs --system-libs)
+CXXFLAGS += -g -O0 -I./   -I${HOME}/Install/protobuf.install/include/
+LDFLAGS :=  -L${HOME}/Install/protobuf.install/lib/  -lprotobuf $(shell $(LLVM_CONFIG) --ldflags --libs --system-libs)
 CXX := g++
 
-SOURCE_FILES := dwarf-type-reader.cpp utils.cpp
+SOURCE_FILES := dwarf-type-reader.cpp utils.cpp variable_type.pb.cc
 PROGRAM := dwarf-type-reader
 
 %.o: %.cpp $(wildcard *.h)
