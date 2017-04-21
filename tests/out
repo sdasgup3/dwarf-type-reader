@@ -1,0 +1,72 @@
+Contents of the .debug_info section:
+
+  Compilation Unit @ offset 0x0:
+   Length:        0x9d (32-bit)
+   Version:       4
+   Abbrev Offset: 0x0
+   Pointer Size:  8
+ <0><b>: Abbrev Number: 1 (DW_TAG_compile_unit)
+    <c>   DW_AT_producer    : (indirect string, offset: 0x45): GNU C11 6.3.0 20170406 -mtune=generic -march=x86-64 -g -fstack-protector-strong
+    <10>   DW_AT_language    : 12	(ANSI C99)
+    <11>   DW_AT_name        : (indirect string, offset: 0x95): test.c
+    <15>   DW_AT_comp_dir    : (indirect string, offset: 0xe): /home/sdasgup3/Github/dwarf-type-reader/Tests
+    <19>   DW_AT_low_pc      : 0x0
+    <21>   DW_AT_high_pc     : 0x1c
+    <29>   DW_AT_stmt_list   : 0x0
+ <1><2d>: Abbrev Number: 2 (DW_TAG_structure_type)
+    <2e>   DW_AT_name        : (indirect string, offset: 0x0): biff
+    <32>   DW_AT_byte_size   : 24
+    <33>   DW_AT_decl_file   : 1
+    <34>   DW_AT_decl_line   : 2
+    <35>   DW_AT_sibling     : <0x50>
+ <2><39>: Abbrev Number: 3 (DW_TAG_member)
+    <3a>   DW_AT_name        : a
+    <3c>   DW_AT_decl_file   : 1
+    <3d>   DW_AT_decl_line   : 4
+    <3e>   DW_AT_type        : <0x50>
+    <42>   DW_AT_data_member_location: 0
+ <2><43>: Abbrev Number: 4 (DW_TAG_member)
+    <44>   DW_AT_name        : (indirect string, offset: 0x3c): children
+    <48>   DW_AT_decl_file   : 1
+    <49>   DW_AT_decl_line   : 5
+    <4a>   DW_AT_type        : <0x57>
+    <4e>   DW_AT_data_member_location: 8
+ <2><4f>: Abbrev Number: 0
+ <1><50>: Abbrev Number: 5 (DW_TAG_base_type)
+    <51>   DW_AT_byte_size   : 4
+    <52>   DW_AT_encoding    : 5	(signed)
+    <53>   DW_AT_name        : int
+ <1><57>: Abbrev Number: 6 (DW_TAG_array_type)
+    <58>   DW_AT_type        : <0x6e>
+    <5c>   DW_AT_sibling     : <0x67>
+ <2><60>: Abbrev Number: 7 (DW_TAG_subrange_type)
+    <61>   DW_AT_type        : <0x67>
+    <65>   DW_AT_upper_bound : 1
+ <2><66>: Abbrev Number: 0
+ <1><67>: Abbrev Number: 8 (DW_TAG_base_type)
+    <68>   DW_AT_byte_size   : 8
+    <69>   DW_AT_encoding    : 7	(unsigned)
+    <6a>   DW_AT_name        : (indirect string, offset: 0x5): sizetype
+ <1><6e>: Abbrev Number: 9 (DW_TAG_pointer_type)
+    <6f>   DW_AT_byte_size   : 8
+    <70>   DW_AT_type        : <0x2d>
+ <1><74>: Abbrev Number: 10 (DW_TAG_subprogram)
+    <75>   DW_AT_external    : 1
+    <75>   DW_AT_name        : foo
+    <79>   DW_AT_decl_file   : 1
+    <7a>   DW_AT_decl_line   : 8
+    <7b>   DW_AT_prototyped  : 1
+    <7b>   DW_AT_type        : <0x50>
+    <7f>   DW_AT_low_pc      : 0x0
+    <87>   DW_AT_high_pc     : 0x1c
+    <8f>   DW_AT_frame_base  : 1 byte block: 9c 	(DW_OP_call_frame_cfa)
+    <91>   DW_AT_GNU_all_call_sites: 1
+ <2><91>: Abbrev Number: 11 (DW_TAG_formal_parameter)
+    <92>   DW_AT_name        : baz
+    <96>   DW_AT_decl_file   : 1
+    <97>   DW_AT_decl_line   : 8
+    <98>   DW_AT_type        : <0x6e>
+    <9c>   DW_AT_location    : 2 byte block: 91 68 	(DW_OP_fbreg: -24)
+ <2><9f>: Abbrev Number: 0
+ <1><a0>: Abbrev Number: 0
+

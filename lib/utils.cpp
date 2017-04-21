@@ -24,7 +24,7 @@ const char* HANDLE_DW_ATE[19] = {
 };
 
 
-static void error(StringRef Filename, std::error_code EC) {
+void error(StringRef Filename, std::error_code EC) {
   if (!EC)
     return;
   errs() << Filename << ": " << EC.message() << "\n";

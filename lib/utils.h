@@ -29,4 +29,6 @@ class DwarfVariableFinder final {
     std::fstream *OS;
 };
 
+void error(StringRef Filename, std::error_code EC);
+
 #endif
