@@ -48,8 +48,6 @@ include_directories(${LLVM_INCLUDE_DIRS})
 #message(LLVM_INCLUDE_DIRS=${LLVM_INCLUDE_DIRS})
 #message(CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR})
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-include(CheckFormat.cmake)
 
   
 # Following commands are specific to this project
@@ -69,12 +67,12 @@ set(LLVM_LINK_COMPONENTS
 )
 
 
-message(LLVM_LINK_COMPONENTS=${LLVM_LINK_COMPONENTS})
+# Adds the -L flag
+link_directories($ENV{HOME}/Install/protobuf.install/lib/)
+
 add_llvm_tool(dwarf-type-reader 
     dwarf-type-reader.cpp
 )
-# Adds the -L flag
-link_directories($ENV{HOME}/Install/protobuf.install/lib/)
 # Adds the -lprtobuf
 target_link_libraries(dwarf-type-reader utils protobuf)
 
@@ -82,6 +80,8 @@ target_link_libraries(dwarf-type-reader utils protobuf)
 #target_link_libraries(dwarf-type-reader utils $ENV{HOME}/Install/protobuf.install/lib/libprotobuf.a)
 
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(CheckFormat.cmake)
 
 
 
