@@ -1,10 +1,10 @@
 
 struct biff
 {
-	int i;
-        char c[2];
+        //struct biff *ptr[2];
+        struct biff *ptr;
 } ;
 
-int foo(struct biff **baz)
+int foo(struct biff baz)
 {
 }

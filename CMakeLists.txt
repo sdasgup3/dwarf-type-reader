@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.4) 
 
+
 #project(DwarfReader)
 project(dwarf-type-reader)
 
@@ -73,7 +74,7 @@ link_directories($ENV{HOME}/Install/protobuf.install/lib/)
 add_llvm_tool(dwarf-type-reader 
     dwarf-type-reader.cpp
 )
-# Adds the -lprtobuf
+# Adds the -lprotobuf
 target_link_libraries(dwarf-type-reader utils protobuf)
 
 # OR
