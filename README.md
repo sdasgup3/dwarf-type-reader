@@ -31,8 +31,8 @@ int foo(struct biff **baz)
 }
 ```
 Output of the tool:
- - mytest.o.debuginfo: The Variable and correcponding type information dumped as protobuf binary.
- - The following ouput is emitted by the tool just for the debug purpose.
+ - **mytest.o.debuginfo** The Variable and correcponding type information dumped as protobuf binary based on the [proto definition file](lib/variable_type.proto)
+ - The **following ouput** is emitted by the tool just for the debug purpose.
 ```C
 local_variables {
   scope {
