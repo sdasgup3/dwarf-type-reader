@@ -18,7 +18,7 @@ To read type information from debug info section of executable usig LLVM based A
   make dwarf-type-reader
 ```
 ## Example
-For the toy C program
+For the toy C program mytest.o
 ```C
 struct biff
 {
@@ -30,7 +30,9 @@ int foo(struct biff **baz)
 {
 }
 ```
-Output of the tool
+Output of the tool:
+ - **mytest.o.debuginfo** The Variable and correcponding type information dumped as protobuf binary based on the [proto definition file](lib/variable_type.proto)
+ - The **following ouput** is emitted by the tool just for the debug purpose.
 ```C
 local_variables {
   scope {
