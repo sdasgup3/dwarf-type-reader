@@ -17,6 +17,13 @@ To read type information from debug info section of executable usig LLVM based A
   cmake -DLLVM_ROOT=/home/sdasgup3/Install/llvm.release.install/ ..
   make dwarf-type-reader
 ```
+## Building the code On Linux
+
+```shell
+  ./build/bin/dwarf-type-reader [--debug] <binary file with debg info>
+```
+
+
 ## Example
 For the toy C program mytest.o
 ```C
