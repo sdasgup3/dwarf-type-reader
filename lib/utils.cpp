@@ -92,6 +92,11 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
       scope->set_symbol_name(
           dwarf::toString(scope_die.find(dwarf::DW_AT_name), "None"));
 
+      uint64_t LowPC, HighPC;
+      LowPC = HighPC = ~0U;
+      assert(scope_die.getLowAndHighPC(LowPC, HighPC));
+      scope->set_entry_address(LowPC);
+
       auto *var = LV->mutable_var();
       var->set_name(dwarf::toString(child.find(dwarf::DW_AT_name), "None"));
 
