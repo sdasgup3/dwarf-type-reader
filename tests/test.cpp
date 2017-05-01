@@ -47,16 +47,15 @@ static const Target *getTarget(const ObjectFile *Obj = nullptr) {
       }
     }
   } else {
-    //std::string str = Triple::normalize(tripleName);
+    // std::string str = Triple::normalize(tripleName);
     std::string str = TheTriple.normalize(tripleName);
     TheTriple.setTriple(str);
-    //TheTriple.setTriple("x86_64-unknown-linux-gnu");
+    // TheTriple.setTriple("x86_64-unknown-linux-gnu");
   }
 
   // Get the target specific parser.
   std::string Error;
-  const Target *TheTarget = TargetRegistry::lookupTarget("", TheTriple,
-                                                         Error);
+  const Target *TheTarget = TargetRegistry::lookupTarget("", TheTriple, Error);
   if (!TheTarget) {
     errs() << Error;
     return nullptr;
@@ -70,12 +69,12 @@ static const Target *getTarget(const ObjectFile *Obj = nullptr) {
 std::string makeLocationString(const DWARFDebugInfoEntryMinimal *die,
                                const DWARFUnit *unit) {
   using namespace llvm::dwarf;
-  unsigned fileno = die->getAttributeValueAsUnsignedConstant(unit,
-    DW_AT_decl_file, 0);
-  unsigned line = die->getAttributeValueAsUnsignedConstant(unit,
-    DW_AT_decl_line, 0);
-  unsigned column = die->getAttributeValueAsUnsignedConstant(unit,
-    DW_AT_decl_column, 0);
+  unsigned fileno =
+      die->getAttributeValueAsUnsignedConstant(unit, DW_AT_decl_file, 0);
+  unsigned line =
+      die->getAttributeValueAsUnsignedConstant(unit, DW_AT_decl_line, 0);
+  unsigned column =
+      die->getAttributeValueAsUnsignedConstant(unit, DW_AT_decl_column, 0);
 
   DWARFUnit *U = const_cast<DWARFUnit *>(unit);
 
@@ -83,8 +82,9 @@ std::string makeLocationString(const DWARFDebugInfoEntryMinimal *die,
   // from the line table.
   std::string str;
   if (const auto *LT = unit->getContext().getLineTableForUnit(U))
-    if (LT->getFileNameByIndex(fileno, U->getCompilationDir(),
-          DILineInfoSpecifier::FileLineInfoKind::AbsoluteFilePath, str)) {
+    if (LT->getFileNameByIndex(
+            fileno, U->getCompilationDir(),
+            DILineInfoSpecifier::FileLineInfoKind::AbsoluteFilePath, str)) {
       str += ':' + std::to_string(line);
       if (column > 0)
         str += ':' + std::to_string(column);
@@ -96,7 +96,7 @@ class TypeInfo {
 public:
   struct FieldInfo {
     FieldInfo(std::shared_ptr<TypeInfo> type, uint64_t offset)
-      : offset(offset), type(std::move(type)) {}
+        : offset(offset), type(std::move(type)) {}
     uint64_t offset;
     std::shared_ptr<TypeInfo> type;
   };
@@ -143,13 +143,12 @@ std::string FunctionInfo::parseLocation(ArrayRef<uint8_t> expression,
   using namespace dwarf;
 
   // We need the MRI to map from DWARF register numbers to ASM names.
-  std::unique_ptr<MCRegisterInfo> mri(
-    getTarget()->createMCRegInfo(tripleName));
+  std::unique_ptr<MCRegisterInfo> mri(getTarget()->createMCRegInfo(tripleName));
 
   uint32_t addrSize = unit->getAddressByteSize();
   DataExtractor extractor(
-    StringRef((const char *)expression.data(), expression.size()),
-    true, addrSize);
+      StringRef((const char *)expression.data(), expression.size()), true,
+      addrSize);
   uint32_t pc = 0;
   std::string program;
   raw_string_ostream prog_out(program);
@@ -159,40 +158,82 @@ std::string FunctionInfo::parseLocation(ArrayRef<uint8_t> expression,
     switch (opcode) {
     case DW_OP_fbreg: {
       int64_t offset = extractor.getSLEB128(&pc);
-      prog_out << offset << "(%" <<
-        mri->getName(mri->getLLVMRegNum(framePointer, false)) << ")";
+      prog_out << offset << "(%"
+               << mri->getName(mri->getLLVMRegNum(framePointer, false)) << ")";
       break;
     }
-    case DW_OP_breg0:  case DW_OP_breg1:  case DW_OP_breg2:
-    case DW_OP_breg3:  case DW_OP_breg4:  case DW_OP_breg5:
-    case DW_OP_breg6:  case DW_OP_breg7:  case DW_OP_breg8:
-    case DW_OP_breg9:  case DW_OP_breg10: case DW_OP_breg11:
-    case DW_OP_breg12: case DW_OP_breg13: case DW_OP_breg14:
-    case DW_OP_breg15: case DW_OP_breg16: case DW_OP_breg17:
-    case DW_OP_breg18: case DW_OP_breg19: case DW_OP_breg20:
-    case DW_OP_breg21: case DW_OP_breg22: case DW_OP_breg23:
-    case DW_OP_breg24: case DW_OP_breg25: case DW_OP_breg26:
-    case DW_OP_breg27: case DW_OP_breg28: case DW_OP_breg29:
-    case DW_OP_breg30: case DW_OP_breg31: {
+    case DW_OP_breg0:
+    case DW_OP_breg1:
+    case DW_OP_breg2:
+    case DW_OP_breg3:
+    case DW_OP_breg4:
+    case DW_OP_breg5:
+    case DW_OP_breg6:
+    case DW_OP_breg7:
+    case DW_OP_breg8:
+    case DW_OP_breg9:
+    case DW_OP_breg10:
+    case DW_OP_breg11:
+    case DW_OP_breg12:
+    case DW_OP_breg13:
+    case DW_OP_breg14:
+    case DW_OP_breg15:
+    case DW_OP_breg16:
+    case DW_OP_breg17:
+    case DW_OP_breg18:
+    case DW_OP_breg19:
+    case DW_OP_breg20:
+    case DW_OP_breg21:
+    case DW_OP_breg22:
+    case DW_OP_breg23:
+    case DW_OP_breg24:
+    case DW_OP_breg25:
+    case DW_OP_breg26:
+    case DW_OP_breg27:
+    case DW_OP_breg28:
+    case DW_OP_breg29:
+    case DW_OP_breg30:
+    case DW_OP_breg31: {
       int64_t offset = extractor.getSLEB128(&pc);
-      prog_out << offset << "(%" <<
-        mri->getName(mri->getLLVMRegNum(opcode - DW_OP_breg0, false)) <<
-        ")";
+      prog_out << offset << "(%"
+               << mri->getName(mri->getLLVMRegNum(opcode - DW_OP_breg0, false))
+               << ")";
       break;
     }
-    case DW_OP_reg0:  case DW_OP_reg1:  case DW_OP_reg2:
-    case DW_OP_reg3:  case DW_OP_reg4:  case DW_OP_reg5:
-    case DW_OP_reg6:  case DW_OP_reg7:  case DW_OP_reg8:
-    case DW_OP_reg9:  case DW_OP_reg10: case DW_OP_reg11:
-    case DW_OP_reg12: case DW_OP_reg13: case DW_OP_reg14:
-    case DW_OP_reg15: case DW_OP_reg16: case DW_OP_reg17:
-    case DW_OP_reg18: case DW_OP_reg19: case DW_OP_reg20:
-    case DW_OP_reg21: case DW_OP_reg22: case DW_OP_reg23:
-    case DW_OP_reg24: case DW_OP_reg25: case DW_OP_reg26:
-    case DW_OP_reg27: case DW_OP_reg28: case DW_OP_reg29:
-    case DW_OP_reg30: case DW_OP_reg31: {
-      prog_out << "%" <<
-        mri->getName(mri->getLLVMRegNum(opcode - DW_OP_reg0, false));
+    case DW_OP_reg0:
+    case DW_OP_reg1:
+    case DW_OP_reg2:
+    case DW_OP_reg3:
+    case DW_OP_reg4:
+    case DW_OP_reg5:
+    case DW_OP_reg6:
+    case DW_OP_reg7:
+    case DW_OP_reg8:
+    case DW_OP_reg9:
+    case DW_OP_reg10:
+    case DW_OP_reg11:
+    case DW_OP_reg12:
+    case DW_OP_reg13:
+    case DW_OP_reg14:
+    case DW_OP_reg15:
+    case DW_OP_reg16:
+    case DW_OP_reg17:
+    case DW_OP_reg18:
+    case DW_OP_reg19:
+    case DW_OP_reg20:
+    case DW_OP_reg21:
+    case DW_OP_reg22:
+    case DW_OP_reg23:
+    case DW_OP_reg24:
+    case DW_OP_reg25:
+    case DW_OP_reg26:
+    case DW_OP_reg27:
+    case DW_OP_reg28:
+    case DW_OP_reg29:
+    case DW_OP_reg30:
+    case DW_OP_reg31: {
+      prog_out << "%"
+               << mri->getName(mri->getLLVMRegNum(opcode - DW_OP_reg0, false));
       break;
     }
     case DW_OP_addr: {
@@ -217,7 +258,9 @@ std::string FunctionInfo::parseLocation(ArrayRef<uint8_t> expression,
       prog_out << " [known constant value]";
       break;
     }
-    case DW_OP_const1u: case DW_OP_const2u: case DW_OP_const4u:
+    case DW_OP_const1u:
+    case DW_OP_const2u:
+    case DW_OP_const4u:
     case DW_OP_const8u: {
       int nBytes = 1 << ((opcode - DW_OP_const1u) / 2);
       uint64_t value = extractor.getUnsigned(&pc, nBytes);
@@ -228,7 +271,9 @@ std::string FunctionInfo::parseLocation(ArrayRef<uint8_t> expression,
       prog_out << extractor.getULEB128(&pc);
       break;
     }
-    case DW_OP_const1s: case DW_OP_const2s: case DW_OP_const4s:
+    case DW_OP_const1s:
+    case DW_OP_const2s:
+    case DW_OP_const4s:
     case DW_OP_const8s: {
       int nBytes = 1 << ((opcode - DW_OP_const1u) / 2);
       int64_t value = extractor.getSigned(&pc, nBytes);
@@ -239,14 +284,38 @@ std::string FunctionInfo::parseLocation(ArrayRef<uint8_t> expression,
       prog_out << extractor.getSLEB128(&pc);
       break;
     }
-    case DW_OP_lit0:  case DW_OP_lit1:  case DW_OP_lit2:  case DW_OP_lit3:
-    case DW_OP_lit4:  case DW_OP_lit5:  case DW_OP_lit6:  case DW_OP_lit7:
-    case DW_OP_lit8:  case DW_OP_lit9:  case DW_OP_lit10: case DW_OP_lit11:
-    case DW_OP_lit12: case DW_OP_lit13: case DW_OP_lit14: case DW_OP_lit15:
-    case DW_OP_lit16: case DW_OP_lit17: case DW_OP_lit18: case DW_OP_lit19:
-    case DW_OP_lit20: case DW_OP_lit21: case DW_OP_lit22: case DW_OP_lit23:
-    case DW_OP_lit24: case DW_OP_lit25: case DW_OP_lit26: case DW_OP_lit27:
-    case DW_OP_lit28: case DW_OP_lit29: case DW_OP_lit30: case DW_OP_lit31: {
+    case DW_OP_lit0:
+    case DW_OP_lit1:
+    case DW_OP_lit2:
+    case DW_OP_lit3:
+    case DW_OP_lit4:
+    case DW_OP_lit5:
+    case DW_OP_lit6:
+    case DW_OP_lit7:
+    case DW_OP_lit8:
+    case DW_OP_lit9:
+    case DW_OP_lit10:
+    case DW_OP_lit11:
+    case DW_OP_lit12:
+    case DW_OP_lit13:
+    case DW_OP_lit14:
+    case DW_OP_lit15:
+    case DW_OP_lit16:
+    case DW_OP_lit17:
+    case DW_OP_lit18:
+    case DW_OP_lit19:
+    case DW_OP_lit20:
+    case DW_OP_lit21:
+    case DW_OP_lit22:
+    case DW_OP_lit23:
+    case DW_OP_lit24:
+    case DW_OP_lit25:
+    case DW_OP_lit26:
+    case DW_OP_lit27:
+    case DW_OP_lit28:
+    case DW_OP_lit29:
+    case DW_OP_lit30:
+    case DW_OP_lit31: {
       prog_out << (opcode - DW_OP_lit0);
       break;
     }
@@ -294,7 +363,7 @@ public:
   DwarfVariableFinder(const DWARFUnit &u) : unit(&u) {}
 
   void findVariables(const DWARFDebugInfoEntryMinimal *die,
-    const DWARFDebugInfoEntryMinimal *functionDie = nullptr);
+                     const DWARFDebugInfoEntryMinimal *functionDie = nullptr);
   void printJSON(raw_ostream &out);
   void printTypeJSON(raw_ostream &out);
 
@@ -304,9 +373,9 @@ private:
   std::vector<std::string> locals;
 
   void handleVarDie(const DWARFDebugInfoEntryMinimal *die,
-    const DWARFDebugInfoEntryMinimal *functionDie);
+                    const DWARFDebugInfoEntryMinimal *functionDie);
   std::shared_ptr<TypeInfo> getType(const DWARFDebugInfoEntryMinimal *die,
-      dwarf::Attribute tag) {
+                                    dwarf::Attribute tag) {
     uint64_t reference = die->getAttributeValueAsReference(unit, tag, 0);
     if (reference == 0)
       return std::make_shared<TypeInfo>("", ~0u);
@@ -323,7 +392,8 @@ private:
   const DWARFUnit *unit;
 };
 
-void DwarfVariableFinder::findVariables(const DWARFDebugInfoEntryMinimal *die,
+void DwarfVariableFinder::findVariables(
+    const DWARFDebugInfoEntryMinimal *die,
     const DWARFDebugInfoEntryMinimal *functionDie) {
   for (auto child = die->getFirstChild(); child; child = child->getSibling()) {
     const DWARFDebugInfoEntryMinimal *context = functionDie;
@@ -335,7 +405,7 @@ void DwarfVariableFinder::findVariables(const DWARFDebugInfoEntryMinimal *die,
       break;
     case dwarf::DW_TAG_subprogram:
       context = child;
-      // Yes, we want to fall though here!
+    // Yes, we want to fall though here!
     default:
       if (child->hasChildren())
         findVariables(child, context);
@@ -343,10 +413,12 @@ void DwarfVariableFinder::findVariables(const DWARFDebugInfoEntryMinimal *die,
   }
 }
 
-void DwarfVariableFinder::handleVarDie(const DWARFDebugInfoEntryMinimal *die,
+void DwarfVariableFinder::handleVarDie(
+    const DWARFDebugInfoEntryMinimal *die,
     const DWARFDebugInfoEntryMinimal *functionDie) {
   const char *name = die->getName(unit, DINameKind::ShortName);
-  if (!name) name = "";
+  if (!name)
+    name = "";
 
   // XXX: lots of nasty repeated work here.
   FunctionInfo context(functionDie, unit);
@@ -365,8 +437,8 @@ void DwarfVariableFinder::handleVarDie(const DWARFDebugInfoEntryMinimal *die,
     uint64_t secOffset = *unparsedLocation.getAsSectionOffset();
     varLoc = parseLocationList(context, secOffset);
   } else {
-    varLoc = '"' + context.parseLocation(*unparsedLocation.getAsBlock(), unit)
-      + '"';
+    varLoc =
+        '"' + context.parseLocation(*unparsedLocation.getAsBlock(), unit) + '"';
   }
 
   // Find the type of this variable.
@@ -389,186 +461,200 @@ void DwarfVariableFinder::handleVarDie(const DWARFDebugInfoEntryMinimal *die,
   (context.getAddress() ? locals : globals).push_back(entry.str());
 }
 
-std::shared_ptr<TypeInfo> DwarfVariableFinder::makeType(
-    const DWARFDebugInfoEntryMinimal *die) {
+std::shared_ptr<TypeInfo>
+DwarfVariableFinder::makeType(const DWARFDebugInfoEntryMinimal *die) {
   using namespace llvm::dwarf;
 
   // Compute the size of the data type. This attribute isn't always present,
   // though, but where it is, it's common to everybody.
-  uint64_t size = die->getAttributeValueAsUnsignedConstant(unit,
-    DW_AT_byte_size, -1);
+  uint64_t size =
+      die->getAttributeValueAsUnsignedConstant(unit, DW_AT_byte_size, -1);
 
   switch (die->getTag()) {
-    // Pretend C++ references are the same as pointers.
-    case DW_TAG_reference_type:
-    case DW_TAG_rvalue_reference_type:
-    case DW_TAG_pointer_type: {
-      std::string subtype = getType(die, DW_AT_type)->getName();
-      // The DIEs here seem to be empty... so void*?
-      if (subtype == "<unknown>") {
-        subtype = "void";
-      }
-      subtype += "*";
-      // XXX: pointer size
-      return std::make_shared<TypeInfo>(subtype, 8);
+  // Pretend C++ references are the same as pointers.
+  case DW_TAG_reference_type:
+  case DW_TAG_rvalue_reference_type:
+  case DW_TAG_pointer_type: {
+    std::string subtype = getType(die, DW_AT_type)->getName();
+    // The DIEs here seem to be empty... so void*?
+    if (subtype == "<unknown>") {
+      subtype = "void";
     }
+    subtype += "*";
+    // XXX: pointer size
+    return std::make_shared<TypeInfo>(subtype, 8);
+  }
 
-    // CV-qualified types: ignore the parameters for the output.
-    case DW_TAG_const_type:
-    case DW_TAG_volatile_type:
-    case DW_TAG_restrict_type:
-      return getType(die, DW_AT_type);
+  // CV-qualified types: ignore the parameters for the output.
+  case DW_TAG_const_type:
+  case DW_TAG_volatile_type:
+  case DW_TAG_restrict_type:
+    return getType(die, DW_AT_type);
 
-    // Fundamental types
-    case DW_TAG_base_type: {
-      TypeKind kind = (TypeKind)
-        die->getAttributeValueAsUnsignedConstant(unit, DW_AT_encoding,
-            DW_ATE_unsigned);
-      std::string encoding = "";
-      switch (kind) {
-      case DW_ATE_boolean: encoding = "bool"; break;
-      // XXX: Represent complex float as a struct float pair?
-      case DW_ATE_complex_float: encoding = "cf"; break;
-      case DW_ATE_float: encoding = "f"; break;
-      case DW_ATE_signed: case DW_ATE_signed_char: encoding = "s"; break;
-      case DW_ATE_unsigned: case DW_ATE_unsigned_char: encoding = "u"; break;
-      case DW_ATE_UTF: encoding = "u"; break;
-      default:
-        errs() << "Unhandled kind " << AttributeEncodingString(kind) << '\n';
-        abort();
-      }
-      encoding += std::to_string(8 * size);
-      return std::make_shared<TypeInfo>(encoding, size);
-    }
-
-    // Treat an enum as a typedef to an integer type.
-    case DW_TAG_enumeration_type: {
-      std::string encoding = "u" + std::to_string(8 * size);
-      return std::make_shared<TypeInfo>(encoding, size);
-    }
-
-    // Pass through typedefs.
-    case DW_TAG_typedef:
-      return getType(die, DW_AT_type);
-
-    // Pretend C++ classes and C structs are the same.
-    case DW_TAG_structure_type:
-    case DW_TAG_class_type:
-    case DW_TAG_union_type: {
-      // We may need to refer to this type later, so insert it into the struct
-      // early.
-      std::string name;
-      raw_string_ostream(name) << "struct" <<
-        format_hex_no_prefix(die->getOffset(), 8);
-      std::shared_ptr<TypeInfo> type = std::make_shared<TypeInfo>(name, size);
-      types[die->getOffset()] = type;
-
-      // Add subentries for various pieces of the struct.
-      const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
-      for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
-        if (childDie->getTag() == DW_TAG_variant_part) {
-          errs() << "Unhandled case, need example\n";
-          die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 1);
-          abort();
-        }
-
-        // These are the only thing that actually represent data elements
-        // in the struct. Well, subprograms have vtable offsets. But let's punt
-        // on that until we actually need to worry about them.
-        if (childDie->getTag() != DW_TAG_inheritance &&
-            childDie->getTag() != DW_TAG_member) {
-          continue;
-        }
-        uint64_t offset = childDie->getAttributeValueAsUnsignedConstant(unit,
-          DW_AT_data_member_location, ~0U);
-        type->getFields().emplace_back(makeType(childDie), offset);
-      }
-      return type;
-    }
-    case DW_TAG_inheritance:
-    case DW_TAG_member: {
-      return getType(die, DW_AT_type);
-    }
-
-    case DW_TAG_array_type: {
-      std::shared_ptr<TypeInfo> inner = getType(die, DW_AT_type);
-      std::string type = inner->getName();
-      uint32_t size = inner->getSize();
-      const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
-      for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
-        std::shared_ptr<TypeInfo> rangeInfo = makeType(childDie);
-        type += "[";
-        type += rangeInfo->getName();
-        type += "]";
-        size *= rangeInfo->getSize();
-      }
-      return std::make_shared<TypeInfo>(type, size);
-    }
-    // This is the inner of an array type.
-    case DW_TAG_subrange_type: {
-      uint64_t count =
-        die->getAttributeValueAsUnsignedConstant(unit, DW_AT_count, 0);
-      return std::make_shared<TypeInfo>(std::to_string(count), count);
-    }
-
-    // Handle function types.
-    case DW_TAG_subroutine_type: {
-      std::string type = getType(die, DW_AT_type)->getName();
-      // DW_AT_type isn't necessary... I guess it's void?
-      if (type == "<unknown>")
-        type = "void";
-      char nextChar = '(';
-      const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
-      for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
-        type += nextChar;
-        type += makeType(childDie)->getName();
-        nextChar = ',';
-      }
-      type += ")";
-      return std::make_shared<TypeInfo>(type, ~0u);
-    }
-    case DW_TAG_formal_parameter:
-      return getType(die, DW_AT_type);
-    case DW_TAG_unspecified_parameters:
-      return std::make_shared<TypeInfo>("...", ~0u);
-
-    case DW_TAG_ptr_to_member_type: {
-      // Someone has a pointer to a member in libxul, it seems, so might as well
-      // handle this. It's not correct, but let's assume Itanium C++ ABI here.
-      // A type of int Foo::* is effectively a ptrdiff_t (intptr_t).
-      // A type of int (Foo::*)() is effectively:
-      // struct {
-      //   union {
-      //     int (*nonvirt)();
-      //     ptrdiff_t vtblOffsetPlus1;
-      //   } ptr;
-      //   ptrdiff_t adj;
-      // }
-      std::shared_ptr<TypeInfo> pointeeType = getType(die, DW_AT_type);
-      std::string name = pointeeType->getName();
-      if (*name.rbegin() == ')') {
-        errs() << "Pointer-to-member functions are EVIL!\n";
-        abort();
-      }
-      name += " T::*";
-      // XXX: pointersize
-      return std::make_shared<TypeInfo>(name, 8);
-    }
-
-    case DW_TAG_unspecified_type: {
-      // Things like void? the first one was decltype(nullptr)
-      //die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 0);
-      return std::make_shared<TypeInfo>("void", ~0u);
-    }
-
-    default: {
-      const char *tagString = TagString(die->getTag());
-      if (!tagString) tagString = "";
-      errs() << "Unhandled tag " << tagString << '\n';
-      die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 0);
+  // Fundamental types
+  case DW_TAG_base_type: {
+    TypeKind kind = (TypeKind)die->getAttributeValueAsUnsignedConstant(
+        unit, DW_AT_encoding, DW_ATE_unsigned);
+    std::string encoding = "";
+    switch (kind) {
+    case DW_ATE_boolean:
+      encoding = "bool";
+      break;
+    // XXX: Represent complex float as a struct float pair?
+    case DW_ATE_complex_float:
+      encoding = "cf";
+      break;
+    case DW_ATE_float:
+      encoding = "f";
+      break;
+    case DW_ATE_signed:
+    case DW_ATE_signed_char:
+      encoding = "s";
+      break;
+    case DW_ATE_unsigned:
+    case DW_ATE_unsigned_char:
+      encoding = "u";
+      break;
+    case DW_ATE_UTF:
+      encoding = "u";
+      break;
+    default:
+      errs() << "Unhandled kind " << AttributeEncodingString(kind) << '\n';
       abort();
-      return std::make_shared<TypeInfo>("", ~0u);
     }
+    encoding += std::to_string(8 * size);
+    return std::make_shared<TypeInfo>(encoding, size);
+  }
+
+  // Treat an enum as a typedef to an integer type.
+  case DW_TAG_enumeration_type: {
+    std::string encoding = "u" + std::to_string(8 * size);
+    return std::make_shared<TypeInfo>(encoding, size);
+  }
+
+  // Pass through typedefs.
+  case DW_TAG_typedef:
+    return getType(die, DW_AT_type);
+
+  // Pretend C++ classes and C structs are the same.
+  case DW_TAG_structure_type:
+  case DW_TAG_class_type:
+  case DW_TAG_union_type: {
+    // We may need to refer to this type later, so insert it into the struct
+    // early.
+    std::string name;
+    raw_string_ostream(name)
+        << "struct" << format_hex_no_prefix(die->getOffset(), 8);
+    std::shared_ptr<TypeInfo> type = std::make_shared<TypeInfo>(name, size);
+    types[die->getOffset()] = type;
+
+    // Add subentries for various pieces of the struct.
+    const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
+    for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
+      if (childDie->getTag() == DW_TAG_variant_part) {
+        errs() << "Unhandled case, need example\n";
+        die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 1);
+        abort();
+      }
+
+      // These are the only thing that actually represent data elements
+      // in the struct. Well, subprograms have vtable offsets. But let's punt
+      // on that until we actually need to worry about them.
+      if (childDie->getTag() != DW_TAG_inheritance &&
+          childDie->getTag() != DW_TAG_member) {
+        continue;
+      }
+      uint64_t offset = childDie->getAttributeValueAsUnsignedConstant(
+          unit, DW_AT_data_member_location, ~0U);
+      type->getFields().emplace_back(makeType(childDie), offset);
+    }
+    return type;
+  }
+  case DW_TAG_inheritance:
+  case DW_TAG_member: {
+    return getType(die, DW_AT_type);
+  }
+
+  case DW_TAG_array_type: {
+    std::shared_ptr<TypeInfo> inner = getType(die, DW_AT_type);
+    std::string type = inner->getName();
+    uint32_t size = inner->getSize();
+    const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
+    for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
+      std::shared_ptr<TypeInfo> rangeInfo = makeType(childDie);
+      type += "[";
+      type += rangeInfo->getName();
+      type += "]";
+      size *= rangeInfo->getSize();
+    }
+    return std::make_shared<TypeInfo>(type, size);
+  }
+  // This is the inner of an array type.
+  case DW_TAG_subrange_type: {
+    uint64_t count =
+        die->getAttributeValueAsUnsignedConstant(unit, DW_AT_count, 0);
+    return std::make_shared<TypeInfo>(std::to_string(count), count);
+  }
+
+  // Handle function types.
+  case DW_TAG_subroutine_type: {
+    std::string type = getType(die, DW_AT_type)->getName();
+    // DW_AT_type isn't necessary... I guess it's void?
+    if (type == "<unknown>")
+      type = "void";
+    char nextChar = '(';
+    const DWARFDebugInfoEntryMinimal *childDie = die->getFirstChild();
+    for (; childDie && childDie->getTag(); childDie = childDie->getSibling()) {
+      type += nextChar;
+      type += makeType(childDie)->getName();
+      nextChar = ',';
+    }
+    type += ")";
+    return std::make_shared<TypeInfo>(type, ~0u);
+  }
+  case DW_TAG_formal_parameter:
+    return getType(die, DW_AT_type);
+  case DW_TAG_unspecified_parameters:
+    return std::make_shared<TypeInfo>("...", ~0u);
+
+  case DW_TAG_ptr_to_member_type: {
+    // Someone has a pointer to a member in libxul, it seems, so might as well
+    // handle this. It's not correct, but let's assume Itanium C++ ABI here.
+    // A type of int Foo::* is effectively a ptrdiff_t (intptr_t).
+    // A type of int (Foo::*)() is effectively:
+    // struct {
+    //   union {
+    //     int (*nonvirt)();
+    //     ptrdiff_t vtblOffsetPlus1;
+    //   } ptr;
+    //   ptrdiff_t adj;
+    // }
+    std::shared_ptr<TypeInfo> pointeeType = getType(die, DW_AT_type);
+    std::string name = pointeeType->getName();
+    if (*name.rbegin() == ')') {
+      errs() << "Pointer-to-member functions are EVIL!\n";
+      abort();
+    }
+    name += " T::*";
+    // XXX: pointersize
+    return std::make_shared<TypeInfo>(name, 8);
+  }
+
+  case DW_TAG_unspecified_type: {
+    // Things like void? the first one was decltype(nullptr)
+    // die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 0);
+    return std::make_shared<TypeInfo>("void", ~0u);
+  }
+
+  default: {
+    const char *tagString = TagString(die->getTag());
+    if (!tagString)
+      tagString = "";
+    errs() << "Unhandled tag " << tagString << '\n';
+    die->dump(llvm::errs(), const_cast<DWARFUnit *>(unit), 0);
+    abort();
+    return std::make_shared<TypeInfo>("", ~0u);
+  }
   }
 }
 
@@ -613,7 +699,7 @@ void DwarfVariableFinder::printTypeJSON(raw_ostream &out) {
 std::string DwarfVariableFinder::parseLocationList(FunctionInfo &context,
                                                    uint64_t secOffset) {
   DataExtractor debugLoc(unit->getContext().getLocSection().Data, true,
-    unit->getAddressByteSize());
+                         unit->getAddressByteSize());
   std::string listData = "";
 
   std::vector<std::string> entries;
@@ -626,11 +712,12 @@ std::string DwarfVariableFinder::parseLocationList(FunctionInfo &context,
       break;
     uint32_t locExprSize = debugLoc.getU16(&offset);
     std::string locationValue = context.parseLocation(
-        ArrayRef<uint8_t>((uint8_t*)debugLoc.getData().data() + offset,
-          locExprSize), unit);
+        ArrayRef<uint8_t>((uint8_t *)debugLoc.getData().data() + offset,
+                          locExprSize),
+        unit);
     entries.emplace_back("{\"start\": " + std::to_string(startAddr) +
-      ", \"end\": " + std::to_string(endAddr) + ", \"location\": \"" +
-      locationValue + "\"}");
+                         ", \"end\": " + std::to_string(endAddr) +
+                         ", \"location\": \"" + locationValue + "\"}");
     offset += locExprSize;
   }
   return "[" + join(entries.begin(), entries.end(), ",") + "]";
@@ -642,9 +729,9 @@ static void printTypes(const DWARFDebugInfoEntryMinimal *die, DWARFUnit *u) {
   finder.printJSON(outs());
 }
 
-static cl::list<std::string>
-InputFilenames(cl::Positional, cl::desc("<input object files>"),
-               cl::ZeroOrMore);
+static cl::list<std::string> InputFilenames(cl::Positional,
+                                            cl::desc("<input object files>"),
+                                            cl::ZeroOrMore);
 
 static int ReturnValue = EXIT_SUCCESS;
 

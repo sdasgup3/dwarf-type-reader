@@ -1,3 +1,1 @@
-int func(int x) {
-  return x -1;
-}
+int func(int x) { return x - 1; }

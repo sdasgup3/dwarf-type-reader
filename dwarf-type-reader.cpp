@@ -19,6 +19,8 @@
 #include <string>
 #include <system_error>
 
+#define DEBUG_TYPE "dwarf_type_reader"
+
 using namespace llvm;
 using namespace object;
 

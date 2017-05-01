@@ -1,4 +1,6 @@
 #include "utils.h"
+#define DEBUG_TYPE "dwarf_type_reader"
+
 
 size_t HANDLE_DW_ATE_SIZE = 19;
 const char *HANDLE_DW_ATE[19] = {"void",
@@ -74,9 +76,11 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
     case dwarf::DW_TAG_variable:
     case dwarf::DW_TAG_formal_parameter:
     case dwarf::DW_TAG_constant: {
-      ::VariableType::LocalVariable *LV = Vars.add_local_variables();
+      ::VariableType::StackVar *LV = Vars.add_stack_variables();
+      DEBUG(
       llvm::errs() << "Var Die : \n";
       child.dump(llvm::errs(), 10);
+      );
 
       if (child.getTag() == dwarf::DW_TAG_formal_parameter) {
         LV->set_is_formal_parameter(true);
@@ -88,9 +92,10 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
       scope->set_symbol_name(
           dwarf::toString(scope_die.find(dwarf::DW_AT_name), "None"));
 
-      LV->set_name(dwarf::toString(child.find(dwarf::DW_AT_name), "None"));
+      auto *var = LV->mutable_var();
+      var->set_name(dwarf::toString(child.find(dwarf::DW_AT_name), "None"));
 
-      auto *TY = LV->mutable_type();
+      auto *TY = var->mutable_type();
       auto type = getType(
           child.getAttributeValueAsReferencedDie(dwarf::DW_AT_type), TY);
 
@@ -107,8 +112,10 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
 std::shared_ptr<::VariableType::Type>
 DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::Type *TY) {
 
-  llvm::errs() << "At Entry : \n";
-  die.dump(llvm::errs(), 10);
+  DEBUG(
+    llvm::errs() << "At Entry : \n";
+    die.dump(llvm::errs(), 10);
+  );
   if (!die.isValid()) {
     llvm::errs() << "Problematic die: \n";
     die.dump(llvm::errs(), 10);

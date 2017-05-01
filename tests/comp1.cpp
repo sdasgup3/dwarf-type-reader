@@ -1,3 +1,1 @@
-static int func(int x) {
-  return x +1;
-}
+static int func(int x) { return x + 1; }
