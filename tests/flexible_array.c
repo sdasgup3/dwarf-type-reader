@@ -1,3 +1,5 @@
+// RUN: gcc  %s -g -c -o %t && ../build/bin/dwarf-type-reader %t
+
 #define __FLEXIBLE_ARRAY_MEMBER
 
 struct _obstack_chunk           /* Lives at front of each chunk. */

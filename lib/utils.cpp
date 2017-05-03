@@ -147,10 +147,9 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
     return std::make_shared<::VariableType::Type>(::VariableType::Type());
   }
 
-  auto opSize = die.find(dwarf::DW_AT_byte_size);
-  if (opSize.hasValue()) {
-    TY->set_size(opSize.getValue().getAsUnsignedConstant().getValue());
-  }
+  // For DW_TAG_pointer_type, we do not have the size
+  TY->set_size(dwarf::toUnsigned(
+          die.find(dwarf::DW_AT_byte_size), ~0U));
 
   std::string type_encoding = "";
   raw_string_ostream SS(type_encoding);
@@ -258,8 +257,8 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
       auto *FTY = field->mutable_field_type();
       makeType(childDie, FTY);
     }
-    //return std::make_shared<::VariableType::Type>(*TY);
-    return typeDict[die.getOffset()];
+    return std::make_shared<::VariableType::Type>(*TY);
+    //return typeDict[die.getOffset()];
   }
 
   case dwarf::DW_TAG_inheritance:
@@ -287,6 +286,8 @@ void DwarfVariableFinder::dump() {
   if (!Vars.SerializeToOstream(OS)) {
     assert(0 && "Failed to write");
   }
-  llvm::errs() << Vars.DebugString();
+  DEBUG(
+    llvm::errs() << Vars.DebugString();
+  );
   google::protobuf::ShutdownProtobufLibrary();
 }

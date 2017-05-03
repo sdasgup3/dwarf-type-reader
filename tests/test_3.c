@@ -1,4 +1,4 @@
-
+// RUN: gcc  %s -g -c -o %t && ../build/bin/dwarf-type-reader %t
 int foo(int first, int m)
 {
 	int bar;
