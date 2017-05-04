@@ -100,7 +100,7 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
       auto *var = LV->mutable_var();
       var->set_name(dwarf::toString(child.find(dwarf::DW_AT_name), "None"));
 
-      auto *TY = var->mutable_type();
+      auto *TY = var->mutable_var_type();
       auto type = getType(
           child.getAttributeValueAsReferencedDie(dwarf::DW_AT_type), TY);
 
@@ -114,8 +114,8 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
   }
 }
 
-std::shared_ptr<::VariableType::Type>
-DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::Type *TY) {
+std::shared_ptr<::VariableType::VarType>
+DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::VarType *TY) {
 
   DEBUG(
     llvm::errs() << "At Entry : \n";
@@ -125,7 +125,7 @@ DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::Type *TY) {
     llvm::errs() << "Problematic die: \n";
     die.dump(llvm::errs(), 10);
     assert(0 && "Invalid Die");
-    return std::make_shared<::VariableType::Type>(::VariableType::Type());
+    return std::make_shared<::VariableType::VarType>(::VariableType::VarType());
   }
 
   auto die_offset = die.getOffset();
@@ -139,12 +139,12 @@ DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::Type *TY) {
   return result;
 }
 
-std::shared_ptr<::VariableType::Type>
-DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
+std::shared_ptr<::VariableType::VarType>
+DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::VarType *TY) {
 
   if (!die.isValid()) {
     assert(0 && "Invalid Die");
-    return std::make_shared<::VariableType::Type>(::VariableType::Type());
+    return std::make_shared<::VariableType::VarType>(::VariableType::VarType());
   }
 
   // For DW_TAG_pointer_type, we do not have the size
@@ -159,48 +159,48 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
     auto opForm = die.find(dwarf::DW_AT_encoding);
     auto opEnc = opForm->getAsUnsignedConstant();
     assert(opEnc < HANDLE_DW_ATE_SIZE);
-    TY->set_c_type(std::string(HANDLE_DW_ATE[*opEnc]));
-    TY->set_kind(::VariableType::Type::isScalar);
-    return std::make_shared<::VariableType::Type>(*TY);
+    TY->set_source_type(std::string(HANDLE_DW_ATE[*opEnc]));
+    TY->set_kind(::VariableType::VarType::isScalar);
+    return std::make_shared<::VariableType::VarType>(*TY);
   }
   case dwarf::DW_TAG_reference_type:
   case dwarf::DW_TAG_rvalue_reference_type:
   case dwarf::DW_TAG_pointer_type: {
-    TY->set_kind(::VariableType::Type::isPointer);
+    TY->set_kind(::VariableType::VarType::isPointer);
     auto *ETY = TY->mutable_element_type();
 
     auto baseTypeDie = die.getAttributeValueAsReferencedDie(dwarf::DW_AT_type);
     if(!baseTypeDie.isValid()) {
       // Handle void type
-      ETY->set_c_type("void");
+      ETY->set_source_type("void");
       ETY->set_size(0);
-      ETY->set_kind(::VariableType::Type::isScalar);
+      ETY->set_kind(::VariableType::VarType::isScalar);
     } else {
        getType(baseTypeDie, ETY);
     }
-    TY->set_c_type("* " + ETY->c_type());
-    return std::make_shared<::VariableType::Type>(*TY);
+    TY->set_source_type("* " + ETY->source_type());
+    return std::make_shared<::VariableType::VarType>(*TY);
   }
   case dwarf::DW_TAG_array_type: {
-    TY->set_kind(::VariableType::Type::isArray);
+    TY->set_kind(::VariableType::VarType::isArray);
     auto *ETY = TY->mutable_element_type();
     auto size = 1;
 
     auto baseType =
         getType(die.getAttributeValueAsReferencedDie(dwarf::DW_AT_type), ETY);
     size *= ETY->size();
-    auto c_type = ETY->c_type();
+    auto source_type = ETY->source_type();
 
     for (auto childDie = die.getFirstChild(); childDie && childDie.getTag();
          childDie = childDie.getSibling()) {
-      auto *DTY = new ::VariableType::Type();
+      auto *DTY = new ::VariableType::VarType();
       makeType(childDie, DTY);
-      c_type = c_type + "[" + DTY->c_type() + "]";
+      source_type = source_type + "[" + DTY->source_type() + "]";
       size *= DTY->size();
     }
     TY->set_size(size);
-    TY->set_c_type(c_type);
-    return std::make_shared<::VariableType::Type>(*TY);
+    TY->set_source_type(source_type);
+    return std::make_shared<::VariableType::VarType>(*TY);
   }
   case dwarf::DW_TAG_subrange_type: {
     uint64_t count = 0;
@@ -219,28 +219,28 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
         count = opCount.getValue().getAsUnsignedConstant().getValue() + 1;
       }
     }
-    TY->set_c_type(std::to_string(count));
+    TY->set_source_type(std::to_string(count));
     TY->set_size(count);
-    return std::make_shared<::VariableType::Type>(*TY);
+    return std::make_shared<::VariableType::VarType>(*TY);
   }
   case dwarf::DW_TAG_typedef: {
     auto baseTypeDie = die.getAttributeValueAsReferencedDie(dwarf::DW_AT_type);
     if(!baseTypeDie.isValid()) {
       // Handle void type
-      TY->set_c_type("void");
+      TY->set_source_type("void");
       TY->set_size(0);
-      TY->set_kind(::VariableType::Type::isScalar);
-      return std::make_shared<::VariableType::Type>(*TY);
+      TY->set_kind(::VariableType::VarType::isScalar);
+      return std::make_shared<::VariableType::VarType>(*TY);
     } 
     return getType(die.getAttributeValueAsReferencedDie(dwarf::DW_AT_type), TY);
   }
   case dwarf::DW_TAG_structure_type:
   case dwarf::DW_TAG_class_type:
   case dwarf::DW_TAG_union_type: {
-    TY->set_kind(::VariableType::Type::isStruct);
-    TY->set_c_type(std::string("struct ") +
+    TY->set_kind(::VariableType::VarType::isStruct);
+    TY->set_source_type(std::string("struct ") +
                    dwarf::toString(die.find(dwarf::DW_AT_name), "None"));
-    typeDict[die.getOffset()] = std::make_shared<::VariableType::Type>(*TY);
+    typeDict[die.getOffset()] = std::make_shared<::VariableType::VarType>(*TY);
 
     // Add subentries for various pieces of the struct.
     for (auto childDie = die.getFirstChild(); childDie && childDie.getTag();
@@ -257,7 +257,8 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
       auto *FTY = field->mutable_field_type();
       makeType(childDie, FTY);
     }
-    return std::make_shared<::VariableType::Type>(*TY);
+    return std::make_shared<::VariableType::VarType>(*TY);
+    //For non recursive type, if we return the following then we get the incomplete type
     //return typeDict[die.getOffset()];
   }
 
@@ -272,7 +273,7 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::Type *TY) {
       llvm::errs() << format("DW_TAG_Unknown_%x", die.getTag());
     }
     die.dump(llvm::errs(), 10);
-    return std::make_shared<::VariableType::Type>(::VariableType::Type());
+    return std::make_shared<::VariableType::VarType>(::VariableType::VarType());
   }
   }
 }

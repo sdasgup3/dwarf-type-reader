@@ -20,13 +20,13 @@ message GlobalVar {
 
 message Variable {
   required string  name = 1;
-  required Type type = 2;
+  required VarType var_type = 2;
 }
 
-message Type {
+message VarType {
   // Base Type
   required int64 size = 1;
-  required string c_type = 2;
+  required string source_type = 2;
   
   // Complex Type
   enum metaType {
@@ -38,7 +38,7 @@ message Type {
 
   required metaType kind = 3;
   // Pointers and Arrays have eleent type 
-  optional Type element_type = 4;
+  optional VarType element_type = 4;
 
   // Arrays have count
   optional int64 count = 5;
@@ -49,7 +49,7 @@ message Type {
 
 message FieldType {
   required int64  field_offset = 1;
-  required Type   field_type  = 2;
+  required VarType   field_type  = 2;
   required string   field_name  = 3;
 }
 

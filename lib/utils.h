@@ -17,10 +17,10 @@ public:
   ~DwarfVariableFinder();
   void findVariablesInCU(const DWARFDie &CU);
   void findVariablesInScope(const DWARFDie &scope);
-  std::shared_ptr<::VariableType::Type> getType(const DWARFDie &die,
-                                                ::VariableType::Type *);
-  std::shared_ptr<::VariableType::Type> makeType(const DWARFDie &die,
-                                                 ::VariableType::Type *);
+  std::shared_ptr<::VariableType::VarType> getType(const DWARFDie &die,
+                                                ::VariableType::VarType *);
+  std::shared_ptr<::VariableType::VarType> makeType(const DWARFDie &die,
+                                                 ::VariableType::VarType *);
   void dump();
 
   // Comes from protobuff definition
@@ -28,7 +28,7 @@ public:
 
 private:
   // Map: Dwaft type die offset --> Type Info
-  DenseMap<uint32_t, std::shared_ptr<::VariableType::Type>> typeDict;
+  DenseMap<uint32_t, std::shared_ptr<::VariableType::VarType>> typeDict;
   std::fstream *OS;
 };
 

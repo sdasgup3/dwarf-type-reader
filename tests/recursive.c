@@ -1,4 +1,4 @@
-// RUN: gcc  %s -g -c -o %t && ../build/bin/dwarf-type-reader %t
+// RUN: gcc  %s -g -c -o %t && ../build/bin/dwarf-type-reader --debug %t
 struct biff
 {
         //struct biff *ptr[2];
