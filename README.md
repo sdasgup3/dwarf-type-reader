@@ -46,10 +46,13 @@ Output of the tool:
  - The **following ouput** is emitted by the tool just for the debug purpose.
 ```C
 local_variables {
+  
+  name = "baz"
   scope {
     symbol_name: "foo"
   }
   is_formal_parameter: true
+  
   type {
     size: 8
     c_type: " ** struct biff"
@@ -88,7 +91,6 @@ local_variables {
       }
     }
   }
-  name: "baz"
 }
 
 ```
