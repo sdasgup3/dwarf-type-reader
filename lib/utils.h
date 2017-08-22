@@ -3,8 +3,8 @@
 
 #include "variable_type.pb.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/BinaryFormat/Dwarf.h"
 #include "llvm/DebugInfo/DWARF/DWARFDie.h"
-#include "llvm/Support/Dwarf.h"
 #include "llvm/Support/raw_ostream.h"
 #include <fstream>
 
