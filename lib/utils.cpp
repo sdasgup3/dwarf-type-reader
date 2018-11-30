@@ -77,7 +77,7 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
     case dwarf::DW_TAG_formal_parameter:
     case dwarf::DW_TAG_constant: {
       ::VariableType::StackVar *LV = Vars.add_stack_variables();
-      DEBUG(
+      LLVM_DEBUG(
       llvm::errs() << "Var Die : \n";
       child.dump(llvm::errs(), 10);
       );
@@ -94,7 +94,7 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
 
       uint64_t LowPC, HighPC, SectionIdx;
       LowPC = HighPC = ~0U;
-      assert(scope_die.getLowAndHighPC(LowPC, HighPC, SectionIdx));
+      //assert(scope_die.getLowAndHighPC(LowPC, HighPC, SectionIdx));
       scope->set_entry_address(LowPC);
 
       auto *var = LV->mutable_var();
@@ -117,7 +117,7 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie &scope_die) {
 std::shared_ptr<::VariableType::VarType>
 DwarfVariableFinder::getType(const DWARFDie &die, ::VariableType::VarType *TY) {
 
-  DEBUG(
+  LLVM_DEBUG(
     llvm::errs() << "At Entry : \n";
     die.dump(llvm::errs(), 10);
   );
@@ -270,7 +270,7 @@ DwarfVariableFinder::makeType(const DWARFDie &die, ::VariableType::VarType *TY) 
   default: {
     auto tagString = TagString(die.getTag());
     if (tagString.empty()) {
-      llvm::errs() << format("DW_TAG_Unknown_%x", die.getTag());
+      //llvm::errs() << format("DW_TAG_Unknown_%x", die.getTag());
     }
     die.dump(llvm::errs(), 10);
     return std::make_shared<::VariableType::VarType>(::VariableType::VarType());
@@ -287,7 +287,7 @@ void DwarfVariableFinder::dump() {
   if (!Vars.SerializeToOstream(OS)) {
     assert(0 && "Failed to write");
   }
-  DEBUG(
+  LLVM_DEBUG(
     llvm::errs() << Vars.DebugString();
   );
   google::protobuf::ShutdownProtobufLibrary();

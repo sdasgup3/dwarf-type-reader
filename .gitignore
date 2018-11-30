@@ -1,0 +1,4 @@
+*.o
+lib/variable_type.pb.*
+tests/*.debuginfo
+tests/*.objdump

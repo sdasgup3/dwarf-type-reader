@@ -29,7 +29,8 @@ static cl::list<std::string> InputFilenames(cl::Positional,
                                             cl::ZeroOrMore);
 
 static void DumpObjectFile(ObjectFile &Obj, StringRef Filename) {
-  std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
+  //std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
+  std::unique_ptr<DWARFContext> DICtx = DWARFContext::create(Obj);
 
   DwarfVariableFinder finder(Filename);
   for (const auto &CU : DICtx->compile_units()) {
