@@ -14,5 +14,10 @@ PROGRAM := disasm
 $(PROGRAM): $(SOURCE_FILES:%.cpp=%.o)
 	$(CXX) -o $(PROGRAM) $^ $(CXXFLAGS) $(LDFLAGS)
 
+.PHONY: clean format
+
 clean:
 	@rm -rf *.o $(PROGRAM)
+
+format:
+	find . -name "*.cpp" | xargs clang-format -style=file -i

@@ -13,11 +13,11 @@
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/Signals.h"
 
-#include "utils.h"
 #include <algorithm>
 #include <list>
 #include <string>
 #include <system_error>
+#include "utils.h"
 
 #define DEBUG_TYPE "dwarf_type_reader"
 
@@ -28,12 +28,13 @@ static cl::list<std::string> InputFilenames(cl::Positional,
                                             cl::desc("<input object files"),
                                             cl::ZeroOrMore);
 
-static void DumpObjectFile(ObjectFile &Obj, StringRef Filename) {
-  std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
+static void DumpObjectFile(ObjectFile& Obj, StringRef Filename) {
+  // std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
+  std::unique_ptr<DWARFContext> DICtx = DWARFContext::create(Obj);
 
   DwarfVariableFinder finder(Filename);
-  for (const auto &CU : DICtx->compile_units()) {
-    const DWARFDie &cu_die = CU->getUnitDIE(false);
+  for (const auto& CU : DICtx->compile_units()) {
+    const DWARFDie& cu_die = CU->getUnitDIE(false);
     finder.findVariablesInCU(cu_die);
   }
   finder.dump();
@@ -47,25 +48,23 @@ static void DumpInput(StringRef Filename) {
 
   Expected<std::unique_ptr<Binary>> BinOrErr =
       object::createBinary(Buff->getMemBufferRef());
-  if (!BinOrErr)
-    error(Filename, errorToErrorCode(BinOrErr.takeError()));
+  if (!BinOrErr) error(Filename, errorToErrorCode(BinOrErr.takeError()));
 
-  if (auto *Obj = dyn_cast<ObjectFile>(BinOrErr->get())) {
+  if (auto* Obj = dyn_cast<ObjectFile>(BinOrErr->get())) {
     DumpObjectFile(*Obj, Filename);
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // Print a stack trace if we signal out.
   sys::PrintStackTraceOnErrorSignal(argv[0]);
   PrettyStackTraceProgram X(argc, argv);
-  llvm_shutdown_obj Y; // Call llvm_shutdown() on exit.
+  llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
 
   cl::ParseCommandLineOptions(argc, argv, "llvm dwarf dumper\n");
 
   // Defaults to a.out if no filenames specified.
-  if (InputFilenames.size() == 0)
-    InputFilenames.push_back("a.out");
+  if (InputFilenames.size() == 0) InputFilenames.push_back("a.out");
 
   std::for_each(InputFilenames.begin(), InputFilenames.end(), DumpInput);
 
