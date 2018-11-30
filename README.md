@@ -14,7 +14,7 @@ To read type information from debug info section of executable usig LLVM based A
 ## Building the code On Linux
 ```shell
   mkdir build; cd  build
-  cmake -DLLVM_ROOT=/home/sdasgup3/Install/llvm.release.install/ ..
+  cmake -DCMAKE_BUILD_TYPE=Debug -DLLVM_ROOT=/home/sdasgup3/Install/llvm.release.install/ ..
   make dwarf-type-reader
 ```
 ## Running the code On Linux
