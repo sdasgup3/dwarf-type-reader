@@ -23,24 +23,25 @@
 
 using namespace llvm;
 using namespace object;
+using namespace cl;
 
 static cl::list<std::string> InputFilenames(cl::Positional,
-                                            cl::desc("<input object files"),
+                                            cl::desc("<input object files>"),
                                             cl::ZeroOrMore);
+static opt<unsigned long long> PC("pc", desc("Load/Store PC <address>."), value_desc("address"), init(~0U));
 
 static void DumpObjectFile(ObjectFile& Obj, StringRef Filename) {
-  // std::unique_ptr<DWARFContext> DICtx(new DWARFContextInMemory(Obj));
   std::unique_ptr<DWARFContext> DICtx = DWARFContext::create(Obj);
 
   DwarfVariableFinder finder(Filename);
   for (const auto& CU : DICtx->compile_units()) {
     const DWARFDie& cu_die = CU->getUnitDIE(false);
-    finder.findVariablesInCU(cu_die);
+    finder.findVariablesInCU(cu_die, PC);
   }
   finder.dump();
 }
 
-static void DumpInput(StringRef Filename) {
+static void DumpType(StringRef Filename) {
   ErrorOr<std::unique_ptr<MemoryBuffer>> BuffOrErr =
       MemoryBuffer::getFileOrSTDIN(Filename);
   error(Filename, BuffOrErr.getError());
@@ -61,12 +62,12 @@ int main(int argc, char** argv) {
   PrettyStackTraceProgram X(argc, argv);
   llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
 
-  cl::ParseCommandLineOptions(argc, argv, "llvm dwarf dumper\n");
+  cl::ParseCommandLineOptions(argc, argv, "llvm dwarf type detector\n");
 
   // Defaults to a.out if no filenames specified.
   if (InputFilenames.size() == 0) InputFilenames.push_back("a.out");
 
-  std::for_each(InputFilenames.begin(), InputFilenames.end(), DumpInput);
+  std::for_each(InputFilenames.begin(), InputFilenames.end(), DumpType);
 
   return EXIT_SUCCESS;
 }

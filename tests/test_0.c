@@ -7,3 +7,9 @@ int foo(MI asI) {
   int *lpsI = &asI;
   return lauI[1] + *lpsI;
 }
+
+int main() {
+  int main_x = 100;
+  foo(main_x);
+  return 0;
+}

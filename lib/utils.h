@@ -16,7 +16,7 @@ class DwarfVariableFinder final {
 public:
   DwarfVariableFinder(StringRef);
   ~DwarfVariableFinder();
-  void findVariablesInCU(const DWARFDie &CU);
+  void findVariablesInCU(const DWARFDie &, uint64_t);
   void findVariablesInScope(const DWARFDie &scope);
   std::shared_ptr<::VariableType::VarType> getType(const DWARFDie &die,
                                                 ::VariableType::VarType *);

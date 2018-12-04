@@ -34,30 +34,47 @@ void error(StringRef Filename, std::error_code EC) {
  */
 DwarfVariableFinder::DwarfVariableFinder(StringRef Filename) {
   std::string outFile = Filename.str() + ".debuginfo";
-  std::error_code EC;
+  // std::error_code EC;
 
-  OS = new std::fstream(outFile,
-                        std::ios::out | std::ios::trunc | std::ios::binary);
-  error(outFile, EC);
+  // OS = new std::fstream(outFile,
+  //                       std::ios::out | std::ios::trunc | std::ios::binary);
+  // error(outFile, EC);
 }
 
-DwarfVariableFinder::~DwarfVariableFinder() { OS->close(); }
+DwarfVariableFinder::~DwarfVariableFinder() {
+  //OS->close(); 
+}
 
 /*
  * Purpose: Find all the variables (locals & gobals) inside the compilation unit
  * die 'die'
  */
-void DwarfVariableFinder::findVariablesInCU(const DWARFDie& CU) {
+void DwarfVariableFinder::findVariablesInCU(const DWARFDie& CU, uint64_t PC) {
+                                            
   for (auto child = CU.getFirstChild(); child; child = child.getSibling()) {
     // Go over all the top level sub_programs
     if (child.isSubprogramDIE() || child.isSubroutineDIE()) {
-      // getInfo(child);
+        if (!child.hasChildren()) {
+          continue;
+        }
 
-      // Look for variables among children of sub_program die
-      if (!child.hasChildren()) {
-        continue;
-      }
-      findVariablesInScope(child);
+        // If PC is not valid, find the variables from all scopes.
+        if(PC == ~0U) {
+          findVariablesInScope(child);
+          continue;
+        }
+
+        std::cout << "PC address: " << PC << "(" << std::hex << PC << ")\n";
+
+        // For valid PC, extract variable info from the enclosing function
+        // scope.
+        uint64_t LowPC = ~0U, HighPC = ~0U, SectionIdx;
+        child.getLowAndHighPC(LowPC, HighPC, SectionIdx);
+
+        // Look for variables in the scope containing the pc adress.
+        if(PC >= LowPC && PC <=HighPC) {
+          findVariablesInScope(child);
+        }
     }
   }
 }
@@ -89,7 +106,7 @@ void DwarfVariableFinder::findVariablesInScope(const DWARFDie& scope_die) {
 
         uint64_t LowPC, HighPC, SectionIdx;
         LowPC = HighPC = ~0U;
-        // assert(scope_die.getLowAndHighPC(LowPC, HighPC, SectionIdx));
+        assert(scope_die.getLowAndHighPC(LowPC, HighPC, SectionIdx));
         scope->set_entry_address(LowPC);
 
         auto* var = LV->mutable_var();
@@ -280,9 +297,11 @@ std::shared_ptr<::VariableType::VarType> DwarfVariableFinder::makeType(
 void DwarfVariableFinder::dump() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  if (!Vars.SerializeToOstream(OS)) {
-    assert(0 && "Failed to write");
-  }
-  LLVM_DEBUG(llvm::errs() << Vars.DebugString(););
+  // if (!Vars.SerializeToOstream(OS)) {
+  //   assert(0 && "Failed to write");
+  // }
+  // LLVM_DEBUG(llvm::errs() << Vars.DebugString(););
+  //LLVM_DEBUG(OS << Vars.DebugString(););
+  std::cout << Vars.DebugString();
   google::protobuf::ShutdownProtobufLibrary();
 }
